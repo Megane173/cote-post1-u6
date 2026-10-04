@@ -39,3 +39,20 @@ Además, las promociones no cumplen conceptualmente el contrato de un ValidadorP
 
 Si dos campañas necesitaran combinarse, la cadena podria adaptarse para eso, pero Chain of Responsibility no define como responsabilidad de sus eslabones producir valores ni establece cómo deben combinarse los valores producidos por varios eslabones. Sería necesario introducir una regla adicional, como sumar los descuentos, tomar el mayor o aplicar una prioridad. En el código actual esta decisión se implementa mediante el estado compartido descuentoCampana y Math.max(). Esto evidencia que la cadena está funcionando principalmente como un mecanismo de ejecucion secuenciasl para ejecutar varias reglas de descuento, no como una verdadera cadena de validaciones.
 
+**Patron aplicado:** Se utiliza **Strategy** porque cada campaña representa una forma independiente de calcular un descuento y las campañas no dependen entre sí para determinar su resultado. DescuentoBlackFriday, DescuentoCorporativo y DescuentoVolumen implementan el mismo contrato EstrategiaDescuento, pero encapsulan reglas diferentes: una depende de la activación de la campaña, otra de la existencia de un NIT y otra de la cantidad total de unidades. CalculadorDescuentoFinal puede evaluar estas estrategias y seleccionar el mayor descuento, sin que las estrategias conozcan entre sí ni dependan de un orden de ejecución.
+
+Se descartó **Chain of Responsibility** porque las campañas no representan una secuencia de validaciones en la que un eslabón deba decidir si rechaza el pedido o delega al siguiente. Todas pueden evaluarse de forma independiente y producir un valor de descuento. En la implementación anterior, las campañas fueron incorporadas artificialmente a ValidadorPedido y utilizaron descuentoCampana como estado compartido, haciendo que la cadena funcionara principalmente como un mecanismo para ejecutar secuencialmente varias reglas de descuento. Esto no correspondía con la responsabilidad de los validadores y constituyó el caso de **Golden Hammer** que se debía corregir.
+
+
+## Cómo ejecutar
+```
+$ mvn spring-boot:run
+$ mvn test
+```
+
+## Herramientas utilizadas
+- Java 17, Spring Boot, Spring JDBC, Maven, H2 Database
+- VS Code / IntelliJ IDEA, Git, GitHub
+
+## Conclusiones
+En este postcontenido se aprendió a aplicar patrones de diseño en un proyecto de Spring Boot a partir de problemas reales en el código. Se pudo ver que antes de aplicar un patrón es importante entender qué problema se quiere solucionar y qué responsabilidades tiene cada parte del sistema. También se aprendió que usar un patrón que ya conocemos no siempre es la mejor opción, como ocurrió con el uso de Chain of Responsibility para las promociones y el caso de Golden Hammer. En general, el ejercicio permitió entender mejor cómo los patrones pueden ayudar a organizar el código cuando se aplican según las necesidades del problema.
