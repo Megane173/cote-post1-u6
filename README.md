@@ -52,7 +52,7 @@ $ mvn test
 
 ## Herramientas utilizadas
 - Java 17, Spring Boot, Spring JDBC, Maven, H2 Database
-- VS Code / IntelliJ IDEA, Git, GitHub
+- VS Code, Git, GitHub
 
 ## Conclusiones
 En este postcontenido se aprendió a aplicar patrones de diseño en un proyecto de Spring Boot a partir de problemas reales en el código. Se pudo ver que antes de aplicar un patrón es importante entender qué problema se quiere solucionar y qué responsabilidades tiene cada parte del sistema. También se aprendió que usar un patrón que ya conocemos no siempre es la mejor opción, como ocurrió con el uso de Chain of Responsibility para las promociones y el caso de Golden Hammer. En general, el ejercicio permitió entender mejor cómo los patrones pueden ayudar a organizar el código cuando se aplican según las necesidades del problema.
