@@ -8,6 +8,7 @@ public class ContextoPedido {
     private double subtotal;
     private boolean rechazado = false;
     private String motivoRechazo;
+    private double descuentoCampana = 0;
 
     public ContextoPedido(PedidoRequest request) { this.request = request; }
 
@@ -19,4 +20,8 @@ public class ContextoPedido {
     public boolean isRechazado() { return rechazado; }
     public String getMotivoRechazo() { return motivoRechazo; }
     public void rechazar(String motivo) { this.rechazado = true; this.motivoRechazo = motivo; }
+    public double getDescuentoCampana(){ return this.descuentoCampana; }
+    public void aplicarDescuentoCampana(double descuento){ 
+        this.descuentoCampana=Math.max(descuento, this.descuentoCampana);
+    }
 }

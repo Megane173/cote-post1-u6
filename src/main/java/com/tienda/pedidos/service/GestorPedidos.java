@@ -4,6 +4,9 @@ import com.tienda.pedidos.descuento.SelectorEstrategiaDescuento;
 import com.tienda.pedidos.dto.PedidoRequest;
 import com.tienda.pedidos.dto.ResultadoPedido;
 import com.tienda.pedidos.validacion.ContextoPedido;
+import com.tienda.pedidos.validacion.PromocionBlackFriday;
+import com.tienda.pedidos.validacion.PromocionCorporativo;
+import com.tienda.pedidos.validacion.PromocionVolumen;
 import com.tienda.pedidos.validacion.ValidadorCliente;
 import com.tienda.pedidos.validacion.ValidadorPedido;
 import com.tienda.pedidos.validacion.ValidadorStock;
@@ -17,9 +20,11 @@ public class GestorPedidos {
     private final NotificacionPedidoService notificacion;
 
     public GestorPedidos(ValidadorStock stock, ValidadorCliente cliente,
-            SelectorEstrategiaDescuento selector, PedidoRepository repository,
-            NotificacionPedidoService notificacion) {
-        this.primerValidador = stock.encadenar(cliente);
+            PromocionBlackFriday blackFriday, PromocionCorporativo corporativo,
+            PromocionVolumen volumen, SelectorEstrategiaDescuento selector,
+            PedidoRepository repository, NotificacionPedidoService notificacion) {
+        this.primerValidador = stock.encadenar(cliente)
+                .encadenar(blackFriday).encadenar(corporativo).encadenar(volumen);
         this.selector = selector;
         this.repository = repository;
         this.notificacion = notificacion;
@@ -28,14 +33,13 @@ public class GestorPedidos {
     public ResultadoPedido procesarPedido(PedidoRequest request) {
         ContextoPedido contexto = new ContextoPedido(request);
         primerValidador.validar(contexto);
-        if (contexto.isRechazado()) {
-            return ResultadoPedido.rechazado(contexto.getMotivoRechazo());
-        }
+        if (contexto.isRechazado()) return ResultadoPedido.rechazado(contexto.getMotivoRechazo());
 
-        double subtotal = this.calcularSubtotal(request); // consulta de precios extraida sin cambios de logica
+        double subtotal = calcularSubtotal(request);
         contexto.setSubtotal(subtotal);
 
-        double descuento = selector.seleccionar(contexto.getTipoCliente()).calcular(contexto);
+        double descuentoTipoCliente = selector.seleccionar(contexto.getTipoCliente()).calcular(contexto);
+        double descuento = Math.max(descuentoTipoCliente, contexto.getDescuentoCampana());
         double impuesto = (subtotal - subtotal * descuento) * 0.19;
         double total = subtotal - (subtotal * descuento) + impuesto;
 
